@@ -1,0 +1,8 @@
+--swiftversion 5.10
+--exclude .build
+
+--indent 4
+--stripunusedargs unnamed-only
+--nospaceoperators ...,..<
+--importgrouping testable-top
+--extensionacl on-extension
