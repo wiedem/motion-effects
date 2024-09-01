@@ -1,6 +1,6 @@
 # MotionEffects
 
-**MotionEffect** is an open source package that makes motion effect functions available for SwiftUI views on iOS.
+**MotionEffects** is an open source package that makes motion effect functions available for SwiftUI views on iOS.
 
 ## Getting Started
 
