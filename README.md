@@ -22,7 +22,7 @@ dependencies: [
 
 ## Usage
 
-Start by by adding `import MotionEffects` to your source code.
+Start by adding `import MotionEffects` to your source code.
 
 ### Set View Offset based on Viewer Offset
 
