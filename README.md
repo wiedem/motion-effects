@@ -9,7 +9,7 @@ Please note that only iOS platforms with version 13 or higher are currently supp
 To use the `MotionEffects` library in a SwiftPM project, add the following line to the dependencies in your `Package.swift` file:
 
 ```swift
-.package(url: "https://github.com/wiedem/motion-effects", .upToNextMajor(from: "1.0.0")),
+.package(url: "https://github.com/wiedem/motion-effects", .upToNextMajor(from: "2.0.0")),
 ```
 
 Include `"MotionEffects"` as a dependency for your executable target:

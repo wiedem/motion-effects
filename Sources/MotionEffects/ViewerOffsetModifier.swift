@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// A modifier that provides viewer-based offset values from movements of the device.
 public struct ViewerOffsetModifier: ViewModifier {
@@ -17,6 +18,7 @@ public struct ViewerOffsetModifier: ViewModifier {
         ZStack {
             ViewerOffsetObservation(updateHandler: updateHandler)
                 .frame(width: 0, height: 0)
+                .allowsHitTesting(false)
 
             content
         }
