@@ -1,4 +1,4 @@
-import SwiftUI
+public import SwiftUI
 
 /// A modifier that offsets a view based on the viewer offset caused by a movement of the device.
 public struct MotionOffsetModifier: ViewModifier {
@@ -37,11 +37,11 @@ public struct MotionOffsetModifier: ViewModifier {
                     height: verticalOffsetRange?.projectViewerOffset(viewerOffset.vertical) ?? 0
                 )
             }
-            .onChange(of: accessibilityReduceMotion) { reduceMotion in
-                if reduceMotion == false {
+            .modifier(OnChangeModifier(value: accessibilityReduceMotion) { reduceMotion in
+                if reduceMotion {
                     viewerBasedOffset = .zero
                 }
-            }
+            })
     }
 }
 
@@ -62,7 +62,7 @@ public extension View {
     }
 }
 
-private extension ClosedRange where Bound == CGFloat {
+extension ClosedRange where Bound == CGFloat {
     func project(
         _ value: CGFloat,
         from sourceRange: ClosedRange<CGFloat>

@@ -1,5 +1,11 @@
-// swift-tools-version:6.0
+// swift-tools-version: 6.0
 import PackageDescription
+
+let commonSwiftSettings: [SwiftSetting] = [
+    .enableUpcomingFeature("ExistentialAny"),
+    .enableUpcomingFeature("InternalImportsByDefault"),
+    .enableUpcomingFeature("StrictConcurrency"),
+]
 
 let package = Package(
     name: "MotionEffects",
@@ -19,10 +25,13 @@ let package = Package(
             resources: [
                 .process("Resources/PrivacyInfo.xcprivacy"),
             ],
-            swiftSettings: [
-                .swiftLanguageMode(.v6),
-                .enableUpcomingFeature("ExistentialAny"),
-            ]
+            swiftSettings: commonSwiftSettings
         ),
-    ]
+        .testTarget(
+            name: "MotionEffectsTests",
+            dependencies: ["MotionEffects"],
+            swiftSettings: commonSwiftSettings
+        ),
+    ],
+    swiftLanguageModes: [.v6]
 )

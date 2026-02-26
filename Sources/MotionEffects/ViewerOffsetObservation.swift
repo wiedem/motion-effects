@@ -1,6 +1,5 @@
-import Foundation
-import SwiftUI
-import UIKit
+internal import SwiftUI
+private import UIKit
 
 struct ViewerOffsetObservation: UIViewRepresentable {
     let updateHandler: (_ viewerOffset: UIOffset) -> Void

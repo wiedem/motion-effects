@@ -1,5 +1,5 @@
-import SwiftUI
-import UIKit
+public import SwiftUI
+private import UIKit
 
 /// A modifier that provides viewer-based offset values from movements of the device.
 public struct ViewerOffsetModifier: ViewModifier {

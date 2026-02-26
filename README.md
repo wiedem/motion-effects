@@ -1,37 +1,54 @@
 # MotionEffects
 
-**MotionEffects** is an open source package that makes motion effect functions available for SwiftUI views on iOS.
+[![Swift 6.0](https://img.shields.io/badge/Swift-6.0-orange.svg)](https://swift.org)
+[![iOS 15+](https://img.shields.io/badge/iOS-15%2B-blue.svg)](https://developer.apple.com/ios/)
+[![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-brightgreen.svg)](https://swift.org/package-manager/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.txt)
 
-## Getting Started
+A lightweight Swift package that brings motion-based parallax effects to SwiftUI views on iOS. It uses the device gyroscope to offset views based on the viewer's perspective, creating subtle depth and movement effects.
 
-Please note that only iOS platforms with version 13 or higher are currently supported.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/wiedem/motion-effects/assets/demo.gif" alt="MotionEffects Demo" width="280">
+</p>
 
-To use the `MotionEffects` library in a SwiftPM project, add the following line to the dependencies in your `Package.swift` file:
+## Requirements
 
-```swift
-.package(url: "https://github.com/wiedem/motion-effects", .upToNextMajor(from: "2.0.0")),
-```
+- iOS 15+
+- Swift 6.0+
+- Xcode 16+
 
-Include `"MotionEffects"` as a dependency for your executable target:
+## Installation
+
+Add the package dependency to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .product(name: "MotionEffects", package: "motion-effects"),
+    .package(url: "https://github.com/wiedem/motion-effects", .upToNextMajor(from: "2.0.0")),
 ]
+```
+
+Then add `"MotionEffects"` to your target's dependencies:
+
+```swift
+.target(
+    name: "YourTarget",
+    dependencies: [
+        .product(name: "MotionEffects", package: "motion-effects"),
+    ]
+)
 ```
 
 ## Usage
 
-Start by adding `import MotionEffects` to your source code.
-
-### Set View Offset based on Viewer Offset
-
-To change the offset of a view based on the offset of the viewer, use the `motionOffset` method:
-
 ```swift
 import MotionEffects
-import SwiftUI
+```
 
+### Motion Offset
+
+Use `.motionOffset(horizontal:vertical:)` to offset a view based on device movement. The viewer offset values from the unit space `-1...1` are projected into the specified ranges.
+
+```swift
 struct DemoView: View {
     var body: some View {
         Color.orange
@@ -44,16 +61,11 @@ struct DemoView: View {
 }
 ```
 
-The viewer-based offsets from the unit space -1...1 are projected into the specified horizontal and vertical offset ranges.
+### Custom Effects
 
-### Custom Effects based on the Viewer Offset
-
-To use a custom effect based on the viewer offset, use the `onViewerOffset` method, which provides the necessary values via a closure:
+Use `.onViewerOffset()` to receive raw viewer offset values and apply custom transformations:
 
 ```swift
-import MotionEffects
-import SwiftUI
-
 struct DemoView: View {
     @State private var shadowOffset = CGPoint(x: 5, y: 5)
 
@@ -62,8 +74,7 @@ struct DemoView: View {
             .frame(width: 100, height: 100)
             .shadow(color: .black.opacity(0.6), radius: 5, x: shadowOffset.x, y: shadowOffset.y)
             .onViewerOffset { viewerOffset in
-                // Note that the viewer offset has a unit value range of -1...1
-                // Use a transformation of the values depending on the requirements of your use case
+                // Viewer offset values are in the range -1...1
                 shadowOffset = CGPoint(
                     x: 5 + viewerOffset.horizontal * 3,
                     y: 5 + viewerOffset.vertical * 3
@@ -72,3 +83,11 @@ struct DemoView: View {
     }
 }
 ```
+
+## Accessibility
+
+MotionEffects automatically respects the system **Reduce Motion** setting. When enabled, motion effects are disabled and views return to their default position.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE.txt) file for details.
