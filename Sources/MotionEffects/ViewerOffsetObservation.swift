@@ -51,7 +51,15 @@ private final class InterpolatingMotionEffectObservation: UIInterpolatingMotionE
     }
 
     override func keyPathsAndRelativeValues(forViewerOffset viewerOffset: UIOffset) -> [String: Any]? {
-        updateHandler(viewerOffset)
+        // Defer the callback to the next RunLoop pass. This method is called by
+        // _UIMotionEffectEngine._applyEffectsFromAnalyzer: while enumerating an
+        // internal NSHashTable of all registered motion effects. Calling the
+        // updateHandler synchronously can lead to addMotionEffect/removeMotionEffect
+        // being invoked during that enumeration, mutating the hash table and causing
+        // an NSGenericException crash ("Collection was mutated while being enumerated").
+        RunLoop.main.perform { [updateHandler] in
+            updateHandler(viewerOffset)
+        }
         return nil
     }
 }
