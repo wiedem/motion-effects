@@ -8,9 +8,7 @@ struct ViewerOffsetObservation: UIViewRepresentable {
         let view = UIView()
 
         if context.environment.accessibilityReduceMotion == false {
-            view.addMotionEffect(
-                InterpolatingMotionEffectObservation(updateHandler: updateHandler)
-            )
+            view.addMotionEffect(ViewerOffsetMotionEffect(updateHandler: updateHandler))
         }
 
         return view
@@ -26,14 +24,12 @@ struct ViewerOffsetObservation: UIViewRepresentable {
             guard uiView.motionEffects.isEmpty else {
                 return
             }
-            uiView.addMotionEffect(
-                InterpolatingMotionEffectObservation(updateHandler: updateHandler)
-            )
+            uiView.addMotionEffect(ViewerOffsetMotionEffect(updateHandler: updateHandler))
         }
     }
 }
 
-private final class InterpolatingMotionEffectObservation: UIInterpolatingMotionEffect {
+private final class ViewerOffsetMotionEffect: UIMotionEffect {
     private let updateHandler: (_ viewerOffset: UIOffset) -> Void
 
     @available(*, unavailable)
@@ -43,11 +39,7 @@ private final class InterpolatingMotionEffectObservation: UIInterpolatingMotionE
 
     init(updateHandler: @escaping (UIOffset) -> Void) {
         self.updateHandler = updateHandler
-
-        super.init(
-            keyPath: "center.x",
-            type: .tiltAlongHorizontalAxis
-        )
+        super.init()
     }
 
     override func keyPathsAndRelativeValues(forViewerOffset viewerOffset: UIOffset) -> [String: Any]? {
