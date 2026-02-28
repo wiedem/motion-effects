@@ -11,32 +11,14 @@ A lightweight Swift package that brings motion-based parallax effects to SwiftUI
   <img src="https://raw.githubusercontent.com/wiedem/motion-effects/assets/demo.gif" alt="MotionEffects Demo" width="280">
 </p>
 
-## Requirements
+## How It Works
 
-- iOS 15+
-- Swift 6.0+
-- Xcode 16+
+MotionEffects is built on top of UIKit's [UIMotionEffect](https://developer.apple.com/documentation/uikit/uimotioneffect) system rather than accessing [CoreMotion](https://developer.apple.com/documentation/coremotion) directly. This means:
 
-## Installation
-
-Add the package dependency to your `Package.swift`:
-
-```swift
-dependencies: [
-    .package(url: "https://github.com/wiedem/motion-effects", .upToNextMajor(from: "2.0.0")),
-]
-```
-
-Then add `"MotionEffects"` to your target's dependencies:
-
-```swift
-.target(
-    name: "YourTarget",
-    dependencies: [
-        .product(name: "MotionEffects", package: "motion-effects"),
-    ]
-)
-```
+- **No privacy permissions required** - no [`NSMotionUsageDescription`](https://developer.apple.com/documentation/bundleresources/information-property-list/nsmotionusagedescription) entry in your Info.plist needed
+- **No motion permission prompt** shown to users
+- **Battery-optimized** - UIKit manages the motion updates based on app state automatically
+- **Built-in signal processing** - UIKit handles sensor data smoothing, device orientation adjustments, reference point calibration, and app lifecycle management internally
 
 ## Usage
 
@@ -87,6 +69,33 @@ struct DemoView: View {
 ## Accessibility
 
 MotionEffects automatically respects the system **Reduce Motion** setting. When enabled, motion effects are disabled and views return to their default position.
+
+## Requirements
+
+- iOS 15+
+- Swift 6.0+
+- Xcode 16+
+
+## Installation
+
+Add the package dependency to your `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/wiedem/motion-effects", .upToNextMajor(from: "2.0.0")),
+]
+```
+
+Then add `"MotionEffects"` to your target's dependencies:
+
+```swift
+.target(
+    name: "YourTarget",
+    dependencies: [
+        .product(name: "MotionEffects", package: "motion-effects"),
+    ]
+)
+```
 
 ## License
 
