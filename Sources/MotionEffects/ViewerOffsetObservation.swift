@@ -4,54 +4,86 @@ private import UIKit
 struct ViewerOffsetObservation: UIViewRepresentable {
     let updateHandler: (_ viewerOffset: UIOffset) -> Void
 
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
-
-        if context.environment.accessibilityReduceMotion == false {
-            view.addMotionEffect(ViewerOffsetMotionEffect(updateHandler: updateHandler))
-        }
-
-        return view
+    func makeUIView(context: Context) -> OffsetHostView {
+        OffsetHostView()
     }
 
-    func updateUIView(_ uiView: UIView, context: Context) {
+    func updateUIView(_ uiView: OffsetHostView, context: Context) {
+        uiView.updateHandler = updateHandler
+
+        // Manage the motion effect based on the accessibility setting.
+        // When reduce motion is enabled, remove the effect and reset the offset.
         if context.environment.accessibilityReduceMotion {
-            guard let effect = uiView.motionEffects.first else {
-                return
+            if let effect = uiView.motionEffects.first {
+                uiView.removeMotionEffect(effect)
             }
-            uiView.removeMotionEffect(effect)
-        } else {
-            guard uiView.motionEffects.isEmpty else {
-                return
-            }
-            uiView.addMotionEffect(ViewerOffsetMotionEffect(updateHandler: updateHandler))
+            updateHandler(.zero)
+        } else if uiView.motionEffects.isEmpty {
+            let effect = ViewerOffsetMotionEffect()
+            effect.hostView = uiView
+            uiView.addMotionEffect(effect)
         }
     }
 }
 
-private final class ViewerOffsetMotionEffect: UIMotionEffect {
-    private let updateHandler: (_ viewerOffset: UIOffset) -> Void
+final class OffsetHostView: UIView {
+    var pendingOffset: UIOffset?
+    var updateHandler: ((UIOffset) -> Void)?
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+
+        isUserInteractionEnabled = false
+        accessibilityElementsHidden = true
+    }
 
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    init(updateHandler: @escaping (UIOffset) -> Void) {
-        self.updateHandler = updateHandler
+    override var intrinsicContentSize: CGSize {
+        .zero
+    }
+
+    // Disable implicit CALayer animations. NSNull stops the action lookup chain.
+    override func action(
+        for layer: CALayer,
+        forKey event: String
+    ) -> (any CAAction)? {
+        NSNull()
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        // Process the pending offset in the layout pass, where it is safe to
+        // trigger view mutations (including addMotionEffect/removeMotionEffect).
+        if let offset = pendingOffset {
+            pendingOffset = nil
+            updateHandler?(offset)
+        }
+    }
+}
+
+private final class ViewerOffsetMotionEffect: UIMotionEffect {
+    weak var hostView: OffsetHostView?
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override init() {
         super.init()
     }
 
     override func keyPathsAndRelativeValues(forViewerOffset viewerOffset: UIOffset) -> [String: Any]? {
-        // Defer the callback to the next RunLoop pass. This method is called by
-        // _UIMotionEffectEngine._applyEffectsFromAnalyzer: while enumerating an
-        // internal NSHashTable of all registered motion effects. Calling the
-        // updateHandler synchronously can lead to addMotionEffect/removeMotionEffect
-        // being invoked during that enumeration, mutating the hash table and causing
-        // an NSGenericException crash ("Collection was mutated while being enumerated").
-        RunLoop.main.perform { [updateHandler] in
-            updateHandler(viewerOffset)
-        }
+        // Defer the callback by writing to the host view and requesting a layout pass.
+        // This method is called during _UIMotionEffectEngine's NSHashTable enumeration,
+        // so calling the updateHandler synchronously would risk mutating that table.
+        hostView?.pendingOffset = viewerOffset
+        hostView?.setNeedsLayout()
         return nil
     }
 }
